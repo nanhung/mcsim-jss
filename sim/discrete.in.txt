@@ -1,0 +1,19 @@
+# Discrete.in
+#------------------------------------------------------------------------------
+
+OutputFile ("discrete.out");
+
+Integrate (Euler, 1, 0, 0);
+
+Experiment {
+
+  z = 1;
+  x1_init = 1;
+
+  PrintStep (x1, 140, 150, 1); 
+  PrintStep (x2, 140, 150, 1);
+  PrintStep (x3, 140, 150, 1);
+
+}
+
+END.

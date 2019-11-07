@@ -1,0 +1,126 @@
+To Do List for MCSim:
+====================
+
+Fix bug: Mod: Problem with spaces before ";", does not exist in Sim.
+
+
+Fix bug: Sim: Problem with assigning an output in the scale section.
+Also, using an output or a state variable on the right hand side in
+Scale results in an error at compilation.
+
+
+Fix bug: Sim: An input cannot be used to define a parameter in the
+global section, i suspect that an output or state cannot either. This
+should be corrected or mentioned in the manual.
+
+
+Fix bug: Sim: ExpisDept condition in mh.c may not be correctly set. 
+F. Bois temptatively fixed it with an "if plevel->pext != NULL" in
+ConvertMCLists, but this should be thoroughly checked.
+
+
+Document: PerRate(), after debugging it.
+
+
+Web pages: The MCSim pages are missing web references. Like what people 
+contributed to it, which free programms can help or assists, where it 
+is linked to. And so on... Possible users could see more examples and 
+opinions about MCSim. Link to http://www.gnu.ai.mit.edu/home.html.
+Talk about the texinfo file.
+
+
+To do: Mod: warn about inputs used in scale (check what manual says
+about that). Only the initial value of the input is used and the
+assignment is not recomputed when the input changes with time.
+
+
+To do: Sim: Prediction() should be usable with any model var at any
+position. This will require modifications at least to simi.c and mh.c
+(LnLikeData).
+
+
+To do: Mod and Sim: hide compilation from the user. use different
+names for the model.c file.
+
+
+To do: Sim: Reinstall data files.
+
+
+To do: Sim: Phase out SimType (make it obsolete).
+
+
+To do: Mod: Check that outputs are actually computed.
+
+
+To do: Sim: Report all errors through ReportErrors.
+
+
+To do: Sim: A relatively minor matter: the code shows a rather casual
+attitude toward freeing malloc'd variables. This will not cause
+problems with unix, but may with PCs (and MACs?). I have formally
+freed all of the malloc'd pointers in my new LEVEL structures, but
+there are a number of fatal errors in the code which do not contain
+pointers to the analysis structure, so that when these errors occur,
+variables cannot be freed (these are ReportError(NULL, ...)
+statements). We should, at some point, ensure that all malloc'd
+variables are freed under all conditions.
+
+
+To do: Sim: Multiple variables in a PrintStep should be allowed.
+
+
+To do: Sim: Reintroduce scaling of inputs by dMag, allow it in mod.
+
+
+To do: Sim: Check that negative times are ok for UpdateInputs, if yes
+correct the mention of positive only times in UpdateInputs.
+
+
+To do: Sim: Allow redefinition of the likelihood for a variable.
+
+
+To do: Sim: There should not be a code distinction between likelihood
+and prior.
+
+
+To do: Sim: Define a Density synonym for Distrib, and implement
+Density(x,ÊUserSpecified,ÊPrediction(something));
+
+
+To do: Sim: it should be possible to set the value of a parameter
+to another in the input file. This is not allowed now.
+
+
+To do: Mod and Sim: Implement matrices and indices with wildcards.
+
+
+To think about: Sim: How to treat parameters that are set by the model
+and for which we still want a parent to depend upon ?
+
+
+To think about: Sim: MCMC: what to do if several measurements are made
+at the same time ? Do another experiment (that's expensive) ?
+
+
+To think about: Sim: Stochastic sims: there should be a way to collect
+their results and produce summary stats.
+
+
+To think about: Sim: Do a separate optimization routine ? or fix
+kernel adjustment in case of non-zero InitRuns
+
+
+To think about: Sim: Put tempering in MCMC.
+
+
+To think about: Sim: Do a Print (y for input_x, <values for input_x>);
+
+
+To think about: Sim: Implement Wishart.
+
+
+To think about: Sim: define several dependent variables, which could
+be integration variables; that could lead to partial differential
+equations solving.
+
+

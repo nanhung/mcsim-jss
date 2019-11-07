@@ -1,0 +1,16 @@
+# Linear Model
+# F. Bois 1996
+# y = A + B * time + N(0,SD_true)
+# Setting SD_true to zero gives the deterministic version
+#------------------------------------------------------------------------------
+
+# Outputs
+Outputs = {y};
+
+# Model Parameters
+A = 0;
+B = 1;
+SD_true = 0;
+SD_esti = 0;
+
+CalcOutputs { y = A + B * t + NormalRandom(0,SD_true); } 

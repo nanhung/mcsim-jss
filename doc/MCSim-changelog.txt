@@ -1,0 +1,625 @@
+Log of Changes for MCSim
+========================
+
+This log has gaps...
+
+
+----------
+Done: 15 Feb 1992: by Don Maszle:
+
+For mod: This version is the same as the IBM version of the program.
+It has been ported with superficial changes (e.g. removing unused
+local variables).  Several changes that need to be made are outlined
+here.  These are a low priority right now, but I will get to them.
+
+
+----------
+Done: 23 Feb 1992: by Don Maszle:
+
+For mod: Changed version number to be in sync with the simulation
+version.  Fixed minor bug in CalcOutputs{} section.  If output
+calculations in this section only depended on previous calculations in
+this section, they were wrong.
+
+
+----------
+Done: 8 May 1992: by Don Maszle:
+
+For mod: Fixed up the output file header so that the intro comment is
+neater -and- so that it contains the name of the input file from which
+it was created (finally!).  Added an szEqn flag for global variable
+declartions.  The constant string, vszHasInitializer flags that the
+given variable has an initializing equation that appear later in the
+list.  This is a quick hack because I didn't want to have to remove
+the decl from the GloVarEqn list, yet I needed to have the definition
+after a potential dependency.  The output routines in modo.c check for
+this flag and do not output anything if true (though it would be
+benign if it did--it would just clutter up the output file).
+Corrected order in which InitModel() equations were written.  The
+initialization have to be written in the order in which they appear so
+that dependencies are handled correctly.  First entries using
+add-change-log-entry-other-window.  The original file follows.
+
+
+----------
+Done: 23 May 1992: by Don Maszle:
+
+For mod: Fixed overlooked problems (I think all) with using the newly
+defined vszHasInitializer flag.  The distinction must be made between
+declaration and definition of a variable.  This had to be accounted
+for in all routines that write definitions, or that count definitions,
+check for existence of equations, etc.  This is really a hack and
+should be fixed.  Currently, any variable can only have one equation
+that defines it.  For States, Outputs, and Input, they also must be
+declared, but the definition must appear where it appears in the file
+so the dependencies are hanlded.  Even using an explicit C-like
+declarations (for example, State Qfat = 50.0, Qbm;) wouldn't really
+solve the problem of having to look for declarations.  Perhaps you
+want to make an explicit Initialization section, -or- force any
+initialization to go into the Scale section which should then be
+renamed.  Other initialization then should be constants only.
+
+
+----------
+Done: 23 May 1992: by Don Maszle:
+
+For mod: Added a small change to allow for straight state assignments
+in the Dynamics() section.  Before, only assignments to derivatives of
+states was allowed here.  An error was issued, and no code file was
+produced.  Now, a new type of equation is defined, ID_DERIV, which is
+a derivative assignment.  Straight state assigments have the type
+ID_STATE and are now allowed, but a warning is issued.  This latter
+type of assigment is dangerous because, if there is an unscheduled
+discontinuity, the integration will be invalid.
+
+
+----------
+Done: 13 Jul 1992: by Don Maszle:
+
+For mod: Fixed the usage message.
+
+
+----------
+Done: 28 Aug 1992: by Don Maszle:
+
+For mod: Added the same info v3.3 added to the comment of model.c
+to global strings for export.  This way pksim can announce
+at the beginning what it is doing and where the info came from.
+
+
+----------
+Done: 19 Jan 1993: by Zeng G. Yuan:
+
+in sim.c: added lsodes_() in function DoOneExperiment (); 
+translated lsodes from Fortran.
+
+
+----------
+Done: 9 Dec 1994: by Frederic Bois:
+
+In gibbs.c, Sample_theta_by_vector: made the multinormal sampling use
+only the non-zero part of the Cholesky decomposition of the covariance
+matrix.
+
+In lsodes2.c, nsfc_: cleaned up and replaced some goto by better code.
+
+In lsodes2.c, cfode: cleaned up and replaced some goto by better code.
+
+In general: replaced MCDATAOUT and derivations by MCPREDOUT for
+avoiding confusion between data and model predictions.
+
+In general: moved several routines, susceptible to be customized by
+the user, to the file yourcode.c. Will facilitate code maintenance.
+
+In simmonte.c and general: changed ReadSetPointData to InitSetPoints.
+Put a check that more than 1 line is in the setpoints file.
+
+
+----------
+Done: 11 Dec 1994: by Frederic Bois:
+
+In gibbs.c, Sample_theta: made the jumping kernel spread adjustable on
+the basis of the acceptance rate.
+
+
+----------
+Done: 13 Dec 1994: by Frederic Bois:
+
+In lsodes1.c, cfode_: cleaned up.
+
+In gibbs.c: started implementing the Subject accounting, and
+population parameters sampling.
+
+
+----------
+Done: 22 Sep 1995: by Frederic Bois:
+
+Checked that all malloc were made with non-zero size. Implemented code
+to track down and report zero size allocation attempt. Such
+allocations result in a failure with cc kind of compilers and should
+be avoided, they are useless anyway.
+
+
+----------
+Documented: 18 Nov 1996: by Frederic Bois:
+
+"acos", "asin", "atan", "atan2", "ceil", "cos", "cosh", "exp", "fabs",
+"floor", "fmod", "log", "log10","pow", "sin", "sinh", "sqrt", "tan",
+"tanh", "CDFNormal", "erfc", "lnDFNormal", "lnGamma", "UniformRandom",
+"NormalRandom", in mod.
+
+
+----------
+Fixed bug: Sim: 19 Nov 1996: by Frederic Bois:
+
+In simo.c: in SaveOutputs: force CalcDeriv at each call, otherwise
+outputs at time zero or less use default parameter values.
+
+
+----------
+Fixed turkey: Sim: 19 Nov 1996: by Frederic Bois:
+
+Now checks that the sum of NStates and NOutputs is less than Dim1Max.
+
+
+----------
+Fixed Bug: Sim: 19 Nov 1996: by Frederic Bois:
+
+FixupDependentInputs needed a if (IFN_NDOSES).
+
+
+----------
+Fixed Bug: Sim: 19 Nov 1996: by Frederic Bois:
+
+Problem with Spikes in CalcInputs: vrgInputs[i].rgMags[x] was not
+defined or not initialized in lexfn (?). Modifications also to
+SaveOutput.
+
+
+----------
+Fixed Bug: Sim: 19 Nov 1996: by Frederic Bois:
+
+A comment was unfinished in init_divisor.
+
+In lexerr.c: Freelevels required a cast of piblm->pinfo as (PANALYSIS).
+
+In random.c: replaced MINFLOAT returns by an error message.
+
+In sim.c: initmodel hasd no parameters.
+
+In mh.c: lnDensity: no value was returned in default case.
+
+In mh.c: /* PrintDeps was an unfinished comment.
+
+In mh.c: a single line whiles (there is at least 2 i think) needed an
+empty {} before ";".
+
+In simi.c: FreeMCLists needed to return something (0 put).
+
+
+----------
+Fixed Bug: Sim: 19 Nov 1996: by Frederic Bois:
+
+In random.c: NormalRandom: now tests racin for zero.
+
+
+----------
+Fixed Bug: Sim: 19 Nov 1996: by Frederic Bois:
+
+A transition time followed by a transition and output time leaded to
+the wrong output.
+
+
+----------
+Fixed turkey: Sim: 19 Nov 1996: by Frederic Bois:
+
+Setpoints not allows you to leave the parameter list empty.
+
+
+----------
+Fixed Bug: Sim: 20 Nov 1996: by Frederic Bois:
+
+In SetPoints spec: two punctuations were required after the number of
+runs; now accepts one or more.
+
+
+----------
+Fixed Bug: Mod and Sim: 7 Dec 1996: by Frederic Bois:
+
+Input functions used in the Scale model definition, and in particular
+at right hand side of equations, are not updated as integration
+progresses, since scale is called only at the beginning of
+integration. Input functions are now not allowed in Scale (too
+dangerous).
+
+
+----------
+Fixed turkey: Mod and Sim: 7 Dec 1996: by Frederic Bois:
+
+VM is not allowed as variable or parameter (for sure).
+
+
+----------
+Fixed turkey: Sim: 7 Dec 1996: by Frederic Bois:
+
+Removed Dim1Max.
+
+
+----------
+Fixed turkey: Sim: 7 Dec 1996: by Frederic Bois:
+
+In sim.c: put strtok to remove spaces in file names, bad for Mac; did
+as in Mod.
+
+
+----------
+Fixed turkey: Sim: 7 Dec 1996: by Frederic Bois:
+
+The ordering of parameters in BetaRandom was illogical.
+
+
+----------
+Fixed turkey: Sim: 7 Dec 1996: by Frederic Bois:
+
+The ordering of times in NDoses is now checked.
+
+
+----------
+Fixed Bug: Mod: 8 Dec 1996: by Frederic Bois:
+
+An undeclared state could have ahd a dynamic equation, now it's
+forbidden.
+
+
+----------
+Done: Sim: 9 Dec 1996: by Frederic Bois:
+
+No state variables is now ok. A stateless model does not call lsodes.
+CalcDeriv has only UpdateInputs.
+
+CalcOutput allows use of 't' for time.
+
+
+----------
+Fixed Bug: Sim: 11 Dec 1996: by Frederic Bois:
+
+Final time are not allowed to be less than any of the output times.
+
+
+----------
+Done: Sim: 11 Dec 1996: by Frederic Bois:
+
+Did a simple Euler routine.
+
+Did a unified error handling after DoOneExperiment fails.
+
+
+----------
+Done: Sim: 12 Dec 1996: by Frederic Bois:
+
+Allowed for more distributions: beta, chi2, binomial, exponential,
+gamma, Poisson.
+
+
+----------
+Done: Sim: 30 Dec 1996: by Frederic Bois:
+
+Replaced "MCMH" by "MCMC".
+
+Changed the banner's version to 4.0.
+
+The syntax error message for Euler in GetIntegrate was wrong (added 0,
+0).
+
+Replaced "Simulate" by "StartTime". If omitted the starting time is
+zero.
+
+Removed lnLike from the output and from LnPosterior.
+
+Disabled InitRuns in MCMC (routine Test).
+
+
+----------
+Fixed Bug: Sim: 30 Dec 1996: by Frederic Bois:
+
+in DoMarkov: too short restart lines were not detected.
+
+GetMCVarySpec: now checks better for the parameter values.
+
+
+----------
+Fixed Bug: Mod: 3 Jan 1996: by Frederic Bois:
+
+A model without inputs, outputs or states produced silently no
+model.c., an error message is now given.
+
+A space before a ";" is an error, this is now documented, but not
+changed;
+
+
+----------
+Done: Sim: 3 Jan 1997: by Frederic Bois:
+
+Cleaned the error message at the end of GetMCVarySpec.
+
+Did an inverse-gamma random routine.
+
+
+----------
+Fixed bug: Sim: 6 Jan 1997: by Frederic Bois:
+
+Inited properly dLnPrior and dLnData in DoMarkov.
+
+Inited properly the iteration counter when reading an MCMC restart
+file.
+
+
+----------
+Done: Mod: 3 Jan 1997: by Frederic Bois:
+
+Cleaned the handling of vszModGenName for _MACOS_.
+
+
+----------
+Fixed bug: Sim: 14 Mar 1997: by Frederic Bois:
+
+mh.c: position of updateAt updating was wrong, only the first variable
+gets updated. I also set the next update at 1.5 times the previous.
+
+
+----------
+Fixed bugs: Sim: 18 Mar 1997: by Frederic Bois:
+
+In lexerr.c: the validity of pibIn before call to FreeLevels was not
+checked in ReportError.
+
+GetMCVarySpec: bounds were not correctly sets for _v distributions
+(forgotten conditionals).
+
+In sim.c; DoMonteCarlo: when reporting integration failure: needed to
+add 1 to iter and experiment numbers. Also: warning was poorly typeset
+(missed a \n).
+
+
+----------
+Done: Sim: 18 Mar 1997: by Frederic Bois:
+
+All references to the exponential distribution parameter call it
+inverse-scale (in mh.c, simi.c and random.c).
+
+
+----------
+Done: Sim: 21 Mar 1997: by Frederic Bois:
+
+In simi.c: made undefined identifier a fatal error, 
+and collapsed two memory allocation checking in one, in GetPrint.
+
+
+----------
+Done: Sim: 10 Apr 1997: by Frederic Bois:
+
+LogNormal_v and TruncLogNormal_v now take the exponential in
+log-space.
+
+Gibbs spec. can still be used but and is now equivalent to MCMC.
+
+
+----------
+Documented: 11 Apr 1997: by Frederic Bois:
+
+Normal_v, TruncNormal_v, LogNormal_v and TruncLogNormal_v (which do
+not take the exp of var, but var itself).
+
+Spikes is now documented.
+
+
+----------
+Done: Sim: 12 May 1997: by Frederic Bois:
+
+in mh.c: in SampleThetas, improved the kernel adjustment.
+
+
+----------
+Documented: 21 May 1997: by Frederic Bois:
+
+Piecewise is now documented.
+
+
+----------
+Done: Sim: 21 May 1997: by Frederic Bois:
+
+Fixed kernel definition and adjustment.
+
+Removed GetParm in simmonte.c.
+
+In sim.c: Disabled simhelp.c; removed dead CheckDependencies code.
+
+In mh.c: the restart file is opened before the output file or
+something like that, so that opening the output with the wrong name
+does not erase the restart.
+
+In simo.c: Removed the 0-1 files in Monte Carlo (removed OF_PARMLIST 
+and OF_MCRESULT options handling in WriteMCOutput).
+
+In mh.c: A data likelihood must be given (checked for in 
+CheckPrintStatements via panal->nModelVars).
+
+A missing data statement was undetected in MCMC sampling. This now
+checked for in CheckPrintStatements in mh.c
+
+If only outputs are asked at only time zero, CalcOutputs is not
+called: that has been corrected by forbidding final times equal to
+starting times. I could eventually do better.
+
+Uniform could not be used for Likelihood. Fixed by assigning min and
+max to parameters 0 and 1 of the distribution.
+
+
+----------
+Done: Sim: 6 Jun 1997: by Frederic Bois:
+
+Reinstalled SetParmsLog in simmonte.c for eventual use.
+
+
+----------
+Fixed bug: Sim: 11 Jun 1997: by Frederic Bois:
+
+Spikes was bugged. Should be fixed. Also introduced the possibility of
+symbolic parameters.
+
+
+----------
+Done: Sim: 6 Jun 1997: by Frederic Bois:
+
+In mh.c: in DoMarkov used pgd->nInitIter to force
+printing of the times, data, and predictions for the last line of the 
+restart file.
+
+
+----------
+Done: Sim: 01 Jul 1997: by Frederic Bois:
+
+MCSim is now GNU software, installed the license.
+
+Changed the banner to version 4.1.
+
+There is now an option to print all predictions in MCMC.
+
+Changed itask to 4, and rwork[0] to dTup in DoOneExperiment (I am
+quite sure that CalcDeriv is not needed anymore in SaveOutputs).
+
+
+----------
+Done: Sim: 2 Jul 1997: by Frederic Bois:
+
+In mh.c: upgraded SetKernel and SetMCVars.
+
+
+----------
+Fixed Bug: Sim: 21 Jul 1997: by Frederic Bois:
+
+Parameter dependencies in Distrib are handled by MonteCarlo and
+SetPoints.
+
+
+----------
+Fixed Bug: Sim: 28 Jul 1997: by Frederic Bois:
+
+In siminit.c: in GetModelInfo, a pmi->nStates of zero led to an error
+return by malloc on some machines (DEC at least). Now fixed.
+
+
+----------
+Done: Sim: 28 Jul 1997: by Frederic Bois:
+
+In mh.c: in ReadRestart, the dummy field can be any string, does not
+need to be an integer (did as in ReadRestart in simmonte.c).
+
+
+----------
+Done: Sim: 30 Jul 1997: by Frederic Bois:
+
+In mh.c: in CloneMCVars, the if (nMCVars != 0) condition was applied to
+globally. pLower->nMCVars needs to be set even if nMCVars is zero.
+
+
+----------
+Fixed Bug: Sim: 12 Aug 1997: by Frederic Bois:
+
+In mh.c: in DoMarkov, fixed the welcome message in case of pgd->nInitIter
+set to one (for fit checking). Removed the printing of a first line of model
+parameters.
+
+
+----------
+Fixed Bug: Sim: 13 Aug 1997: by Frederic Bois:
+
+In simi.c: in NewExperiment, nMCVars and nFixedVars were not initialized, 
+that caused crashes in FreeOneLevel.
+
+
+----------
+Done: Sim: 13 Aug 1997: by Frederic Bois:
+
+In simi.c: in GetListOfTimes, the "Times out of order" error is now fatal; 
+plistTimes is freed before checking times in pdTimes; pdTimes are freed before 
+issuing the error message.
+
+
+----------
+Done: Sim: 14 Aug 1997: by Frederic Bois:
+
+In lexfn.c: in GetNDoses and GetSpikes, all errors are now fatal.
+
+
+----------
+Done: Sim: 22 Aug 1997: by Frederic Bois:
+
+In perc.model and perc.ndoses.in: introduced additional dosing parameters and 
+cleaned up. This is for better debugging of the bugged Spikes specification.
+
+
+----------
+Fixed Bug: Sim: 9 Sep 1997: by Frederic Bois:
+
+In modelu.c: in UpdateInputs, the spikes case was bugged (when using Spikes
+together with other input functions. I removed the useless PostUpdateSpikes
+routine. Also in FixupDependentInputs the 1e-6 subtracted from dTexp has
+been removed: it caused strange behavior and rare cases and it not needed.
+
+
+----------
+Done: Sim: 11 Sep 1997: by Frederic Bois:
+
+In sim.c: in DoOneExperiment: now check that the starting time is less than 
+or equal to the first discontinuity or output time.
+
+
+----------
+Done: Sim: 21 Sep 1997: by Frederic Bois:
+
+In sim.c, mac.c, sim.c, yourcode.c, lsodes1.c, lexerr.c, mac.h: 
+Setup contains code that is accessed and used only if the symbol _MACOSLEVEL2_ 
+is defined. Level 2 for Macintosh gives a windows interface and some conformity 
+to the MacOS interface guidelines. The behavior of this file maybe 
+compiler-dependent (I use Symantec's Think C).
+Level 1 Macintosh implementation is obtained by defining the symbol 
+_MACOSLEVEL1_ and gives a standard console which should be provided by 
+the compiler.
+
+in mh.c: in LnLikeData: the code to handle INPUT_MISSING_VALUE was itself
+missing. Has been reinstalled.
+
+
+----------
+Done: Sim: 2 Oct 1997: by Frederic Bois:
+
+In mh.c, in SampleThetas: the code to check that kernel SD would not increase
+too much was not correctly handling the uniform and loguniform cases. This is
+fixed.
+
+
+----------
+Done:Sim: 20 Oct 1997: by Frederic Bois:
+
+In mh.c (and mh.h): introduced the routines necessary for vector sampling
+in MCMC simulations.
+
+
+----------
+Done:Sim: 24 Oct 1997: by Frederic Bois:
+
+In mh.c and matutil.c: upgraded the handling of errors in the Cholesky 
+decomposition used to prepare the multinormal jumping kernel.
+
+
+----------
+Done:Sim: 11 Nov 1997: by Frederic Bois:
+
+In mh.c: upgraded the updating of kernel size in SampleThetas, and
+         replaced several "int" by "long".
+
+
+
+
+

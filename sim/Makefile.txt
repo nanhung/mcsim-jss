@@ -1,0 +1,285 @@
+# Makefile
+#
+# written by Don Robert Maszle
+#
+# for mcsim  a simulation program and utilities.
+#           `mcsim' is based on a program by Frederic Bois.
+#
+# Copyright (c) 1991 Frederic Bois and Don Maszle
+# All rights reserved.
+#
+#----------------------------------------------------------------------
+# INTRODUCTION
+#
+#  This is a general format makefile to allow for ease of porting
+#  between systems.  All system dependent and program dependent
+#  specifications are defined as symbols in several sections as
+#  described below.
+#
+#  `>>>>' indicates sections where things might commonly be changed
+#  like the name of the compiler, or the name of the program to be
+#  compiled.
+#
+#  `****' introduces important notes.
+#
+#
+#----------------------------------------------------------------------
+#
+#  `Make' is specifically designed to be used with several language
+#  compilers including C, FORTRAN, Lex, and Yacc.  A system Makefile
+#  defines default settings for a number of standard variables that
+#  specify the names of the various stages of compilation for different
+#  languages, and flags to these compilers, in addition to defining default
+#  compilation (inference) rules that use file prefixes to determine the
+#  the rule.
+#
+#  This file overrides many default system settings, and some inference
+#  rules.  To do so correctly, Standard Makefile Names Must Be Used.
+#  Several standard variables are listed here.  See the manual for a
+#  complete description (on Unix do `man make').
+#
+#       CC     :  Name of the C compiler
+#       CFLAGS :  Flags passed to the $(CC) with every file
+#
+#       LINK   :  Name of the linker
+#       CLFLAGS:  any compiler flags that get passed to the linker,
+#       LFLAGS :  any flags specific to the linker.
+#
+
+#---------- System Calls ----------
+#
+#>>>>  Define any system dependent calls here
+
+ECHO = echo
+COPY = cp
+DEL = rm
+MKDIR = mkdir
+MOD = mod
+
+
+
+#---------- Compiler ----------
+#
+#>>>>  Define the COMPILER name and LINKER name here only.
+
+CC = gcc
+LINK = gcc
+
+#>>>>  Define PATHS
+#	The include path should be a directory containing header
+#	files which are not in the standard include path.  Use `.'
+#	if none is used.  
+INCPATH = .
+OBJPATH = o
+
+
+
+#---------- Flags ----------
+#
+#  Define the flags for each cycle of compilation.
+#
+#  NOTE:  Only if you are compiling with gcc should you use
+#         both debugging and optimization together.  Most (all?)
+#         other compilers get confused, or won't accept the flags.
+#
+#>>>> Define debugging symbols and flags.
+#
+#     The symbols DEBUG and NDEBUG have different effects!  Some
+#     library macros use DEBUG (to include debugging code) and others
+#     use NDEBUG (to disinclude code). 
+#
+#     As an example, assertions ("assert.h") must be explicitely
+#     DISincluded by defining NDEBUG, while, generally, diagnostic
+#     messages must be included by defining DEBUG. 
+#
+#>>>> To compile with DEBUGGING uncomment the next lines
+#
+#DEBUG_SYMBOLS = -DDEBUG
+#C_DEBUG_FLAG = -g
+#L_DEBUG_FLAG = -g
+#
+#>>>> To compile with OPTIMIZATION uncomment the following lines
+#
+DEBUG_SYMBOLS = -DNDEBUG
+C_OPTIM_FLAG = -O
+L_OPTIM_FLAG =
+
+#
+#>>>> Include any special warning flags 
+#
+WARNINGS = -Wall -ansi
+
+#--------------------
+#****  You shouldn't need to change the next 2 lines.  They are dependent
+#****  only on the above setup.
+
+CFLAGS = $(C_OPTIM_FLAG) $(C_DEBUG_FLAG) $(DEBUG_SYMBOLS) \
+	-I $(INCPATH) $(WARNINGS)
+CLFLAGS = $(L_OPTIM_FLAG) $(L_DEBUG_FLAG)
+
+
+#
+#>>>> Extra link flags.  Include libraries here
+#
+LFLAGS = -lm
+
+
+
+#---------- Model definition ----------
+#
+#      Mcsim is compiled for a particular model which
+#      is described in a model description file.
+#      A target below assures that the current "model.c"
+#      source file is up to date with the current model.
+#      `make MODEL=otherfile' will compile with another filename.
+
+#>>>>> MODEL is the model currently being used.
+#
+MODEL=perc.model
+
+#>>>>> MODELT is the target to create for compilation *without*
+#      the .c suffix.
+#
+MODELT=model
+
+
+#---------- Program spec ----------
+#
+#  Several suffixes are used for this section.  If the target
+#  is called `xxx', then the following symbols have these meanings:
+#
+#  xxx		: Final target name
+#  xxxDEP	: All dependencies of target
+#  xxxO		: Object files for target
+#  xxxO1,
+#  xxxO2	: Alternate object files for target
+#  xxxH, xxxH1..: Header files, perhaps grouped with the objects
+#
+#  Repeat the program specs as needed.  For each target, include
+#  a link spec at the end of this file.
+#
+#>>>> Executable filename
+MCSIM=mcsim
+
+MCSIMT=$(MCSIM)
+MCSIMLIBZ=$(MM)libc$(FPL)
+
+#>>>> Object files, one per line followed by a \ to continue the line.
+#     These can be partitioned if need be into logical groups.
+#
+MCSIMO =\
+        getopt.o\
+	mh.o\
+	lex.o\
+	lexerr.o\
+	lexfn.o\
+	list.o\
+        lsodes1.o\
+        lsodes2.o\
+	matutil.o\
+	matutilo.o\
+	$(MODELT).o\
+	modelu.o\
+        optdesign.o\
+	random.o\
+	sim.o\
+	simi.o\
+	siminit.o\
+	simmonte.o\
+	simo.o\
+        strutil.o\
+	yourcode.o
+MCSIMDEP =$(MCSIMO)
+
+
+
+#---------- Targets ---------- 
+#
+#>>>> These are all the targets for the Makefile
+#
+#     `one' is the default target as it is the first in the file
+#
+#
+#**** Compilation targets must have a link rule
+#**** and inference rules associated with them.
+
+one: $(MCSIMT)
+
+
+
+#---------- Inference Rules ---------- 
+#
+#****  These replace the default inference rules defined in the system
+#****  makefile.  No need to make changes here.
+
+.c.$(OBJPATH)/%.o:
+	$(CC) $(CFLAGS) -o $(OBJPATH)/$@ $<
+#	$(CC) $(CFLAGS) -o $@ $(<:$(OBJPATH)/%=%)
+
+
+#---------- Special compilation ----------
+#**** Specifiy the model generator compilation here.
+#
+$(MODELT).c: $(MODEL)
+	$(MOD) $(MODEL) $(MODELT).c
+
+
+#---------- Link Rules ---------- 
+#
+#>>>>  Each compilation target must have a link rule defining the
+#      linking stage of compilation.  The basic format is in the
+#      target xxxT and its dependency list xxxDEP.  The second
+#      and subsequent lines execute the $(LINK) command and pass
+#      the following:
+#        CLFLAGS:  any compiler flags that get passed to the linker,
+#        xxxT   :  the output target name,
+#        xxxDEP :  the dependency list of objects, and
+#        LFLAGS :  any flags specific to the linker.
+#
+#setenv LIB=$(LIBZ)  ??
+
+$(MCSIMT): $(MCSIMDEP) 
+	@echo 'Linking $(MCSIMT)...'
+	@$(LINK) $(CLFLAGS) -o $(MCSIMT) $(MCSIMDEP) $(LFLAGS)
+	@echo
+	@echo '* Created executable "$(MCSIMT)".'
+
+#dependencies
+getopt.o:       getopt.h
+lex.o:          hungtype.h lex.h lexerr.h sim.h
+lexerr.o:       hungtype.h lex.h lexerr.h sim.h simi.h
+lexfn.o:        hungtype.h lex.h lexerr.h lexfn.h matutil.h modelu.h \
+	        modiface.h sim.h strutil.h
+list.o:         hungtype.h lex.h lexerr.h list.h sim.h
+lsodes1.o:	hungtype.h lex.h lexfn.h lsodes.h modiface.h sim.h yourcode.h
+lsodes2.o:	hungtype.h lex.h lexfn.h lsodes.h modiface.h
+matutil.o:	hungtype.h lex.h lexfn.h list.h matutil.h modiface.h \
+	        random.h sim.h
+matutilo.o:	matutilo.h
+mh.o:		lexerr.h mh.h modiface.h list.h matutil.h random.h sim.h \
+		simmonte.h
+model.o:	modelu.h
+modelu.o:	hungtype.h lex.h lexfn.h list.h matutil.h modelu.h modiface.h \
+	        random.h sim.h strutil.h
+optdesig.o:	optdesign.h hungtype.h lexerr.h matutil.h simmonte.h \
+		yourcode.h sim.h modiface.h list.h matutil.h random.h
+random.o:	hungtype.h lex.h random.h
+sim.o:		getopt.h hungtype.h lex.h lexerr.h lexfn.h list.h optdesign.h \
+		lsodes.h matutil.h modiface.h random.h sim.h \
+		simi.h siminit.h simmonte.h simo.h strutil.h yourcode.h
+simi.o:		hungtype.h lex.h lexerr.h lexfn.h list.h \
+		matutil.h modiface.h random.h sim.h \
+		simi.h siminit.h simmonte.h strutil.h
+siminit.o:	hungtype.h lex.h lexerr.h lexfn.h list.h \
+		matutil.h modiface.h random.h sim.h \
+		siminit.h
+simmonte.o:	hungtype.h lex.h lexerr.h lexfn.h list.h \
+		matutil.h modiface.h random.h sim.h \
+		simmonte.h strutil.h
+simo.o:		hungtype.h lex.h lexerr.h lexfn.h list.h \
+		matutil.h modiface.h random.h sim.h \
+		simo.h yourcode.h
+strutil.o:	strutil.h
+yourcode.o:     hungtype.h lex.h lexerr.h lexfn.h list.h \
+		mac.h matutil.h modiface.h random.h sim.h \
+		simmonte.h yourcode.h

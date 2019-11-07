@@ -1,0 +1,21 @@
+# Linear model
+#------------------------------------------------------------------------------
+
+SimType (MonteCarlo);
+
+Integrate (Lsodes, 1e-2, 1e-2, 0);
+
+MonteCarlo ("linear.hier.mtc.out", 10, -56761.1164);
+
+Distrib (A,  Normal, 0, 0.1);
+Distrib (B,  Normal, 1, 0.2);
+
+Experiment {
+
+ SD_true = 0.05;
+
+ PrintStep (y, 0, 10, 1);
+
+}
+
+END.

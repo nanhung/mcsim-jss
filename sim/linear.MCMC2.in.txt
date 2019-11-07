@@ -1,0 +1,39 @@
+# Linear model - twice the same experiment
+#------------------------------------------------------------------------------
+
+SimType (MCMC);
+
+Integrate (Lsodes, 1e-2, 1e-2, 0);
+
+MCMC ("linear.MCMC2.out",      # output file
+       "",                     # name of restart file
+       "",                     # unused field, leave blank
+       200, 0,                 # iterations, print predictions flag,
+       1, 200,                 # printing frequency, iters to print
+       434563.1961);           # dSeed
+
+Level {
+
+  Distrib(A, Normal, 0, 10); # exact mean
+  Distrib(B, Normal, 1, 10); # exact mean
+  Distrib(y, Normal, Prediction(y), 0.05); # exact SD
+
+  Level {
+
+    Experiment {
+      PrintStep (y, 0, 10, 1);
+      Data  (y, -0.0289654, 1.15968, 2.32502, 3.33289, 4.61105, 5.6818, 
+                 6.89044, 8.13242, 9.27033, 10.4522, 11.6703);
+    }
+
+    Experiment {
+      PrintStep (y, 0, 10, 1);
+      Data  (y, -0.0289654, 1.15968, 2.32502, 3.33289, 4.61105, 5.6818, 
+                 6.89044, 8.13242, 9.27033, 10.4522, 11.6703);
+    }
+  }
+}
+
+END.
+
+

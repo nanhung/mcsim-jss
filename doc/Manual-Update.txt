@@ -1,0 +1,22 @@
+Last Minute Additions to the MCSim Manual
+
+- You can report bugs to us, by sending email to:
+  "bug-mcsim@prep.ai.mit.edu".
+
+  You can request help from us, and from other MCSim users,
+  by sending email to:
+  "help-mcsim@prep.ai.mit.edu".
+
+  You can also subscribe to those lists if you want to 
+  automatically receive bug reports and help messages
+  from others:
+
+  To add yourself, send to (list name)-request@prep.ai.mit.edu 
+  the word subscribe (as subject or content).  So, for example,
+  for help-mcsim@prep.ai.mit.edu the address would be
+  help-mcsim-request@prep.ai.mit.edu.
+
+  To remove yourself, send to (list name)-request@prep.ai.mit.edu 
+  the word unsubscribe (as subject or content).
+
+

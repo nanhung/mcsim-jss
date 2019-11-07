@@ -1,0 +1,300 @@
+# Makefile
+#
+# written by Don Robert Maszle
+#
+# for mod: a preprocessor for MCSim simulation program
+#
+# Copyright (c) 1991  Frederic Bois and Don Maszle
+# All rights reserved.
+#
+#----------------------------------------------------------------------
+# INTRODUCTION
+#
+#  This is a general format makefile to allow for ease of porting
+#  between systems.  All system dependent and program dependent
+#  specifications are defined as symbols in several sections as
+#  described below.
+#
+#  `>>>>' indicates sections where things might commonly be changed
+#  like the name of the compiler, or the name of the program to be
+#  compiled.
+#
+#  `****' introduces important notes.
+#
+#  The section TARGETS below describes the targets for this Makefile.
+#
+#----------------------------------------------------------------------
+#  There is an initialization section that sets up object, exe
+#  and library directories as specified under Initialization Parameters.
+#
+
+#---------- Standard Makefile names ----------
+#
+#****  Standard Makefile names should be used throughout this file.
+#****
+#
+#  `Make' is specifically designed to be used with several language
+#  compilers including C, FORTRAN, Lex, and Yacc.  A system Makefile
+#  defines default settings for a number of standard variables that
+#  specify the names of the various stages of compilation for different
+#  languages, and flags to these compilers, in addition to defining default
+#  compilation (inference) rules that use file prefixes to determine the
+#  the rule.
+#
+#  This file overrides many default system settings, and some inference
+#  rules.  To do so correctly, Standard Makefile Names Must Be Used.
+#  Several standard variables are listed here.  See the manual for a
+#  complete description (on Unix do `man make').
+#
+#       CC     :  Name of the C compiler
+#       CFLAGS :  Flags passed to the $(CC) with every file
+#
+#       LINK   :  Name of the linker
+#       CLFLAGS:  any compiler flags that get passed to the linker,
+#       LFLAGS :  any flags specific to the linker.
+#
+
+#----------------------------------------------------------------------
+#
+# TARGETS
+#
+# There are several targets:
+#
+#    mod        This is the DEFAULT target and will compile simply
+#               by calling `make'.  It creates the `mod' program
+#
+#		Help for this program is available by running 
+#		`mod -h'.  This help facility is under development
+#		and is not complete.
+#
+#    arc, ver, zip
+#		This target creates a version archive using the VER,
+#		ARCPREFIX, and ARCSUFFIX variables.  All archivable files
+#		should be included in the defintion of SOURCE.
+#
+#    clean, realclean
+#		`clean' removes objects and other temporarily created stuff.
+#		`realclean' removes other stuff not distributed
+#
+
+
+
+#---------- System Calls ----------
+#
+#>>>>  Define any system dependent calls here
+
+ECHO = echo
+COPY = cp
+DEL = rm
+MKDIR = mkdir
+ARC  = tar
+ARCFLAGS = cvf
+MOD = mod
+
+
+
+#---------- Compiler ----------
+#
+#>>>>  Define the COMPILER name and LINKER name here only.
+
+CC = gcc
+LINK = gcc
+
+#>>>>  Define PATHS
+#	The include path should be a directory containing header
+#	files which are not in the standard include path.  Use `.'
+#	if none is used.  
+INCPATH = .
+#INCPATH = /vol/moby/moby_a/gnu/sun4_sunos4.1.3/lib/g++-include
+OBJPATH = o
+
+
+
+#---------- Flags ----------
+#
+#  Define the flags for each cycle of compilation.
+#
+#  NOTE:  Only if you are compiling with gcc should you use
+#         both debugging and optimization together.  Most (all?)
+#         other compilers get confused, or won't accept the flags.
+#
+#>>>> Define debugging symbols and flags.
+#
+#     The symbols DEBUG and NDEBUG have different effects!  Some
+#     library macros use DEBUG (to include debugging code) and others
+#     use NDEBUG (to disinclude code). 
+#
+#     As an example, assertions ("assert.h") must be explicitely
+#     DISincluded by defining NDEBUG, while, generally, diagnostic
+#     messages must be included by defining DEBUG. 
+#
+#>>>> To compile with DEBUGGING uncomment the next lines
+#
+#DEBUG_SYMBOLS = -DDEBUG
+#C_DEBUG_FLAG = -g
+#L_DEBUG_FLAG = -g
+#
+#>>>> To compile with OPTIMIZATION uncomment the following lines
+#
+DEBUG_SYMBOLS = -DNDEBUG
+C_OPTIM_FLAG = -O
+L_OPTIM_FLAG =
+
+#
+#>>>> Include any special warning flags 
+#
+WARNINGS = -Wall
+
+#--------------------
+#****  You shouldn't need to change these lines.  They are dependent
+#****  only on the above setup.
+
+CFLAGS = $(C_OPTIM_FLAG) $(C_DEBUG_FLAG) $(DEBUG_SYMBOLS) \
+	-I $(INCPATH) $(WARNINGS) -DMODGEN
+CLFLAGS = $(L_OPTIM_FLAG) $(L_DEBUG_FLAG)
+
+
+#
+#>>>> Extra link flags.  Include libraries here
+#
+LFLAGS = -lm
+
+
+
+#---------- Archive specs ----------
+#
+#>>>> All possible SOURCE files for archiving.
+#     Realize that some may be on Dos so that case may need
+#     to be both upper and lower.
+SOURCE = *.c *.h *.def *.gpf *.hlp *.s *.txt Makefile* makefile* *z *Z *in* *out* *.deb *.err *.dat *.pnt read* READ* perc* ChangeLog mf*
+
+#>>>> Archive file to create
+#     We may want to override the version from the command line
+#     The name is composed using the prefix, version and suffix.
+#     Try to maintain easy compatibility with DOS.
+VER=334
+ARCPREFIX=mod
+ARCSUFFIX=tar
+ARCFILE=$(ARCPREFIX)$(VER).$(ARCSUFFIX)
+
+
+
+#---------- Program spec ----------
+#
+#  Several suffixes are used for this section.  If the target
+#  is called `xxx', then the following symbols have these meanings:
+#
+#  xxx		: Final target name
+#  xxxDEP	: All dependencies of target
+#  xxxO		: Object files for target
+#  xxxO1,
+#  xxxO2	: Alternate object files for target
+#  xxxH, xxxH1..: Header files, perhaps grouped with the objects
+#
+#  Repeat the program specs as needed.  For each target, include
+#  a link spec at the end of this file.
+#
+#>>>> Executable filename
+MOD=mod
+
+MODT=$(MOD)
+MODLIBZ=$(MM)libc$(FPL)
+
+#>>>> Object files, one per line followed by a \ to continue the line.
+#     These can be partitioned if need be into logical groups.
+#
+MODO =\
+	lex.o\
+	lexerr.o\
+	lexfn.o\
+	mod.o\
+	modd.o\
+	modi.o\
+	modo.o\
+	strutil.o
+MODDEP =$(MODO)
+
+
+
+#---------- Targets ---------- 
+#
+#>>>> These are all the targets for the Makefile
+#
+#     `one' is the default target as it is the first in the file
+#
+#     Others can be selected at the command line by running
+#     "make target-name"
+#
+#**** Compilation targets must have a link rule
+#**** and inference rules associated with them.
+#
+#     Other targets may be included such as the
+#     `make clean' target which cleans up a directory.
+
+one: $(MODT)
+
+mcs: $(MODT)
+
+
+#-- `Clean' cleans up the main project, which is `mod'
+
+clean:
+	-$(DEL) *.o $(OBJPATH)/*.o
+	-$(DEL) core
+
+#-- `Realclean' cleans up other crud too
+
+realclean: clean
+	-$(DEL) $(MODT)
+	-$(DEL) $(CONVANALT)
+	-$(DEL) $(STESTT)
+
+#-- `arc', `ver', and `zip' make a version archive be it `pkzip' or `tar'
+#    or otherwise
+
+arc ver zip:
+	$(ARC) $(ARCFLAGS) $(ARCFILE) $(SOURCE)
+
+
+
+#---------- Inference Rules ---------- 
+#
+#****  These replace the default inference rules defined in the system
+#****  makefile.  No need to make changes here.
+
+.c.$(OBJPATH)/%.o:
+	$(CC) $(CFLAGS) -o $(OBJPATH)/$@ $<
+#	$(CC) $(CFLAGS) -o $@ $(<:$(OBJPATH)/%=%)
+
+
+#---------- Special compilation ----------
+#**** Specifiy the model generator compilation here.
+#
+
+
+#---------- Link Rules ---------- 
+#
+#>>>>  Each compilation target must have a link rule defining the
+#      linking stage of compilation.  The basic format is in the
+#      target xxxT and its dependency list xxxDEP.  The second
+#      and subsequent lines execute the $(LINK) command and pass
+#      the following:
+#        CLFLAGS:  any compiler flags that get passed to the linker,
+#        xxxT   :  the output target name,
+#        xxxDEP :  the dependency list of objects, and
+#        LFLAGS :  any flags specific to the linker.
+#
+#setenv LIB=$(LIBZ)  ??
+
+$(MODT): $(MODDEP) 
+	@echo 'Linking $(MODT)...'
+	@$(LINK) $(CLFLAGS) -o $(MODT) $(MODDEP) $(LFLAGS)
+	@echo
+	@echo '* Created executable "$(MODT)".'
+
+
+lex.o:          lex.h
+lexfn.o:        lex.h
+modd.o:         lex.h
+modi.o:         lex.h
+modo.o:         lex.h

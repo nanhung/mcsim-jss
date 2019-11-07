@@ -1,0 +1,15 @@
+The users's manual for MCSim is provided as:
+
+mcsim.texinfo: the basic text, which can be processed by GNU texinfo
+               to generate all the following formats and GNU info files
+               (refer to GNU info for more info...).
+
+mcsim.dvi:     a dvi file produced by TeX from mcsim.texinfo. You can
+               process this dvi file with dvips to generate a ps file.
+
+mcsim.ps:      a postscript file generated from dvi. You can download
+               it to a postscript printer (on Macintosh the LaserWriter
+               Utility can do that).
+
+mcsim.html:    a single html file generated from mcsim.texinfo by
+               texi2html.

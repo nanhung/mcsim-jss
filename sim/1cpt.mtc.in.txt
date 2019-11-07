@@ -1,0 +1,34 @@
+# One Compartment Model
+# First order input and output
+# Can be used for single or multiple dosing
+#--------------------------------------------------------------------------------
+
+SimType (SetPoints);
+
+Integrate (Lsodes, 1e-2, 1e-2, 1);
+
+SetPoints ("1cpt.mtc.out", "1cpt.mtc.dat", 0, ka, ke, F, 
+           SD_C_central, SD_AUC);
+
+V = 1;
+
+CV_C_cen_true = 0.0;
+CV_AUC_true   = 0.0;
+
+Experiment {
+
+Dose = 1;
+
+Print (ln_C_central, ln_AUC, 1, 5, 10, 15, 20, 40, 60, 100, 140);
+
+}
+
+Experiment {
+
+Dose = 10;
+
+Print (ln_C_central, ln_AUC, 1, 2, 3, 5, 10, 20, 40, 50, 100, 120, 140);
+
+}
+
+END.

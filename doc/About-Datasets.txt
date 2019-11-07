@@ -1,0 +1,53 @@
+************************************
+The following sample datasets and corresponding models are provided only 
+online, as examples of use of the software.
+
+***
+ - A dichloromethane toxicokinetic model for mice. The included files
+   should allow the lucky you to reproduce an analysis performed for
+   the US Occupational Safety and Health Administration. You need to
+   have installed MCSim, and understood the manual to use those files. 
+   A technical report giving important (or even necessary) background
+   to this model is available from Dr. Christine Whittaker Sofge -
+   OSHA Health Standards Policy Division - HSP-OSHA-DOL - Rm. N3718 -
+   200 Constitution Ave. NW - Washington, DC 20210,
+   (email: CWhitake@dol.gov).
+
+   The files are:
+   
+   - dcm.mouse.model: the model definition file.
+
+   - dcm.mouse.rst  : a restart file containing a parameter vector from the
+                      (approximate) joint posterior distribution of all 
+                      parameter. If you use it as a starting point for 
+                      Markov chain simulations you should quickly reach
+                      equilibrium.
+
+   - dcm.mouse.MCMC.in : a simulation file for Markov chain Monte Carlo
+                         simulations. Uses dcm.mouse.rst as restart file.
+
+   - dcm.mouse.fit.in  : a simple simulation file to help you check quality
+                         of data predictions ("fit").
+
+   - dcm.mouse.metab.in : a SetPoint simulation file to produce predictions
+                          relevant to cancer risk assessment. It uses the 
+                          output of the dcm.mouse.MCMC.in file as source of
+                          parameter vectors.
+
+***
+ - A model similar to the above for dichloromethane toxicokinetics in 
+   humans. The corresponding files are:
+
+   - dcm.human.model
+   - dcm.human.rst
+   - dcm.human.MCMC.in
+   - dcm.human.fit.in
+   - dcm.human.metab.in
+   - mh.human.c : a special code file that you should use instead of mh.c
+     when compiling the human simulation program for MCMC simulations.
+     The function LnLikeData has been customized to use the SDs reported
+     for each data point in the human dataset.
+
+************************************
+Additional sample files (for a linear model, a discrete-time model etc.) 
+are included with the source code.
